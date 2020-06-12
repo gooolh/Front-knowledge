@@ -43,9 +43,27 @@
 - 位置计算  利用posttion属性  将元素left 和top 偏移50%  再减去本身的宽度和高度的50% translateX(50%) translateY(50%)
 - 利用 display table属性
 
-## 二级联动选择器
+## margin重叠
 
-```
+margin是块级元素两个或多个（可能相邻或嵌套重叠）外边距重合起来使用一起使用
 
-```
+相邻margin重叠的问题
+
+解决办法：
+
+1. 底部元素设置浮动
+2. 底部元素的postion absolute/fixed
+3. 在设置margin-top。bottom统一设置上或下
+
+嵌套marigin问题
+
+父元素无 border、padding、inline content 、 clearance时，子元素的margin-top/bottom会与父元素的margin产生重叠问题。
+
+解决办法：
+
+- 外层元素添加padding
+- 外层元素 overflow:hidden;
+- 外层元素透明边框 border:1px solid transparent;
+- 内层元素绝对定位 postion:absolute:
+- 内层元素 加float:left;或display:inline-block;
 

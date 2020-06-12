@@ -7,17 +7,17 @@
 5. null
 6. symbol
 
-`underfined`与`null`的区别
+## `underfined`与`null`的区别
 
 - null表示一个 `无` 的对象 underfined 表示变量未赋值
 - 在转换为数字时结果不同，`Number(null)`为`0`，而`undefined`为`NaN`。
 
-`typeof`与`instanceof`的区别
+## `typeof`与`instanceof`的区别
 
 - typeof 返回一个变量的类型，注意：基本类型除`null`返回是object 外，其他正常返回对应的数据类型，引用类型除了函数会显示为`'function'`，其它都显示为`object`。
 - instanceof 判断某个构造函数是否在对象的原型链之中
 
-手写一个`instanceof`
+## 手写一个`instanceof`
 
 ```javascript
 function myInstanceof(left,right){
@@ -30,7 +30,7 @@ function myInstanceof(left,right){
 }
 ```
 
-手写一个`new`
+## 手写一个`new`
 
 ```javascript
 function myNew(fn,...args){
@@ -39,6 +39,79 @@ function myNew(fn,...args){
     return result==='object'? result:instance   //如果构造返回一个对象的话，就使用这个对象，否则使用刚才创建的实例
 }
 ```
+
+
+
+## 手写AJAX
+
+```javascript
+function ajax(options={}) {
+    options=Object.assign({
+        url:'',
+        method:'get',
+        timeout: 1000,
+        data: null,
+        header:{},
+        success:function () {
+
+        },
+        onerror:function () {
+
+        }
+    },options)
+
+    let xhr=new XMLHttpRequest()
+    xhr.timeout=options.timeout
+    xhr.setRequestHeader(options.header)
+    xhr.open(options.method,options.url)
+    xhr.onreadystatechange=function () {
+        if (xhr.readyState==4 && xhr.status==200){
+            let data=JSON.parse(xhr.response)
+            options.success(data)
+        }else {
+            options.onerror()
+        }
+    }
+    xhr.ontimeout=options.onerror()
+    xhr.send(options.data)
+}
+```
+
+## 手写Promise
+
+```javascript
+//简版Promise
+//executor参数是一个方法，方法有个两个参数，resolve，reject 一样为函数，这样简版就没有实现reject
+function Promise(executor) {
+    //用一个数组保存then回调的事件
+    this.onResolveCallback = []
+    let _this=this
+    function resolve(value) {
+        setTimeout(() => {
+            _this.data = value
+            _this.onResolveCallback.forEach(item => item(value))
+        })
+    }
+    executor(resolve)
+}
+Promise.prototype.then = function (onResolved) {
+    const _this = this
+    return new Promise(resolve => {
+        _this.onResolveCallback.push(value => {
+            const result = onResolved(value)
+            //交个用户自定义Promise处理，使用then方法添加事件，再回调处理。
+            if (result instanceof Promise) {
+                result.then(resolve)
+            } else {
+                //执行回调
+                resolve(result)
+            }
+        })
+    })
+}
+```
+
+
 
 ## 浅拷贝
 
@@ -178,7 +251,7 @@ js它是单线程的，所以执行任务时需要排队，JS异步执行机制�
 缺点：
 
 - 常驻内存，增加内存使用量
-- 使用不当会造成内存泄露（死循环）
+- 使用不当会造成内存泄露
 
 使用场景：
 
@@ -314,5 +387,41 @@ const observer=new InterSectionObserver(changes=>{
     }
 })
 Array.from(img).forEach(item=>obserber(item))
+```
+
+## 实现一个批量请求函数 multiRequest(urls, maxNum)
+
+要求：
+
+1. 要求最大并发数 maxNum
+2. 每当有一个请求返回，就留下一个空位，可以增加新的请求
+3. 所有请求完成后，结果按照 urls 里面的顺序依次打出
+
+```javascript
+function handleFetchQueue(urls, max, callback) {
+    const urlCount = urls.length;
+    const requestsQueue = [];
+    const results = [];
+    let i = 0;
+    const handleRequest = (url,j) => {
+        const req = fetch(url).then(res => {
+            results[j]=res
+            console.log(results.length)
+            if (i + 1 < urlCount) {
+                requestsQueue.shift();
+                handleRequest(urls[++i],i)
+            } else if (results.length === urlCount) {
+                console.log(results)
+                'function' === typeof callback && callback(results)
+            }
+        }).catch(e => {
+            results[j]=e
+        });
+        if (requestsQueue.push(req) < max) {
+            handleRequest(urls[++i],i)
+        }
+    };
+    handleRequest(urls[i],i)
+}
 ```
 
