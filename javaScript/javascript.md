@@ -1,4 +1,6 @@
-## JS基本数据类型
+## JS数据类型
+
+### 基本类型
 
 1. number
 2. string
@@ -6,6 +8,10 @@
 4. undefined
 5. null
 6. symbol
+
+### 引用类型
+
+1. object
 
 ## `underfined`与`null`的区别
 
