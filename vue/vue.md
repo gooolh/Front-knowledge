@@ -21,8 +21,32 @@ vue2.x使用的是Object.defineProperty 来监听数据的变化，vue3.x使用�
 
 手写双向绑定 Object.defineProerty方式
 
-```
-
+```javascript
+//超级简单版
+//html
+<h1 id="name"></h1>
+<input type="text">
+//js
+let obj={}
+let el=document.getElementById("name")
+let input = document.querySelector('input');
+function defineReactive(obj, key, val) {
+    Object.defineProperty(obj, key, {
+        enumerable: true,
+        configurable: true,
+        set(v) {
+            val = v
+            el.innerText=val
+        },
+        get() {
+            return val
+        }
+    })
+}
+defineReactive(obj,"name","")
+input.oninput = function (e) {
+    obj.name = e.target.value
+}
 ```
 
 ## computed 和 watch的区别
