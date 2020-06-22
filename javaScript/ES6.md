@@ -253,3 +253,196 @@ g.next() //{value:2,done:true}
 g.next() //{value:undefined,done:true}
 ```
 
+### yield 表达式  
+
+由于 Generator 函数返回的遍历器对象， 只有调用 `next` 方法才会遍历下一个内部状态， 所以其实提供了一种可以暂停执行的函数。 yield 表达式就是暂停标志。  
+
+当遇到`yield` 表达式时会暂停后面的执行，返回`yield` 表达式后面的值，等下一次调用`next`方法时，会从暂停的地方开始执行.注意`yield`表达式只能出现在Generator 函数里面。
+
+### 与`Iterable`的关系
+
+之前说过，`Iterator`  接口也是返回一个遍历器对象，有了`Iterator`接口我们可以很轻松的遍历内部数据,比如使用`for of`和扩展运算符
+
+有了Generator 函数我们可以很轻松在一个对象上部署`Iterator`  接口，只需要`[Symbol.iterator]=function *gen(){}` 就行了,比如
+
+```javascript
+let obj={}
+obj[Symbol.iterator]=function *gen(){
+    yield 1
+    yield 2
+}
+console.log([...obj])  //[1,2]
+
+```
+
+### next方法的参数
+
+`yield`表达式本身没有返回值，next方法可以带一个参数，该参数就会当作上一个`yield`的返回值了
+
+例子
+
+```javascript
+function* dataConsumer() {
+    console.log('Started');
+    console.log(`1. ${yield}`);
+    console.log(`2. ${yield}`);
+    return 'result';
+}
+let genObj = dataConsumer();
+genObj.next();
+// Started
+genObj.next('a')
+// 1. a
+genObj.next('b')
+// 2. b
+```
+
+### Generator.prototype.throw()
+
+Generator 原型对象上的方法，可以在Generator 抛出错误，在Generator函数体内捕获。如果函数体内没有部署`try...cathch`代码块捕获，将会被外部的`try...cathch`代码块捕获。
+
+例子
+
+```javascript
+var g = function* () {
+    try {
+        yield 2;
+        yield 3;
+    } catch (e) {
+        console.log('内部捕获', e);
+    }
+};
+var i = g();
+i.next();
+try {
+    i.throw('a');
+    i.throw('b');
+} catch (e) {
+    console.log('外部捕获', e)
+}
+// 内部捕获 a
+// 外部捕获 b
+```
+
+
+
+## Generator.prototype.return()  
+
+Generator 函数返回的遍历器对象， 还有一个 return 方法， 可以返回给定的值，并且终结遍历 Generator 函数。  
+
+```javascript
+function* gen() {
+    yield 1;
+    yield 2;
+    yield 3;
+}
+v
+let g = gen();
+g.next() // { value: 1, done: false }
+g.return('foo') // { value: "foo", done: true }
+g.next() // { value: undefined, done: true }
+```
+
+
+
+### yield* 表达式
+
+如果函数内部调用另一个Generator函数，默认情况是没有效果的。
+
+这时候就需要用到yield* 表达式了，
+
+比如数组扁平化的例子
+
+```javascript
+function *gen(arr) {
+    for (const item of arr) {
+        if (item instanceof Array) {
+            yield* gen(item)
+        }else{
+            yield item
+        }
+    }
+}
+```
+
+## class的基本语法
+
+在ES6出现之前，生成对象的方法是通过构造函数。而ES6的`class`可以看作一个语法糖，它的绝大部分功能，ES5都可以做到,新的`class`写法只是让对象的原型的写法更加清晰。
+
+```javascript
+class Point{
+	constructor(x,y){
+        this.x=x
+        this.y=y
+    }
+    toString(){
+        return '(' + this.x + ', ' + this.y + ')';
+    }
+}
+
+typeof Point // "function"
+Point === Point.prototype.constructor // true
+```
+
+类的数据类型就是函数，类本身就指向构造函数。
+
+`class`里面的方法都定义在类的`proototype` 属性上面。等同于ES5中
+
+```javascript
+Point.prototype.toString=funtion(){}
+```
+
+但是 与ES5中不同的是,**ES6创建的不可枚举的。**
+
+类和模块的内部， 默认就是严格模式。   
+
+### constructor 方法
+
+`constructor` 方法是类的默认方法，通过`new`命令生成对象实例时，自动调用该方法。一个类必须有`constructor`方法，如果没有显示定义，就会添加一个空的进去。
+
+constructor 方法默认返回实例对象（ 即 this ） ， 完全可以指定返回另外一个对象  
+
+### class表达式
+
+与函数一样，类也可以使用表达式的形式定义
+
+```javascript
+const point=class{}
+```
+
+### 不存在提升
+
+类不存在变量提升，与ES5不一样。因为子类必须在父类后面定义。
+
+### 静态方法
+
+类相当于实例的原型， 所有在类中定义的方法， 都会被实例继承。 如果在一个方法前， 加上 static 关键字， 就表示该方法不会被实例继承， 而是直接通过类来调用， 这就称为“静态方法”。  
+
+
+
+### class继承
+
+Class 可以通过 extends 关键字实现继承， 这比 ES5 的通过修改原型链实现继承， 要清晰和方便很多。  子类必须在 constructor 方法中调用 super 方法， 否则新建实例时会报错。 这是因为子类没有自己的 this 对象， 而是继承父类的 this 对象， 然后对其进行加工。 如果不调用 super 方法， 子类就得不到 this 对象。  
+
+```javascript
+class Point {
+    constructor(x,y) {
+        this.x=x
+        this.y=y
+    }
+}
+class  ColorPoint extends Point{
+    constructor(x,y) {
+       // super(x,y) 报错了	
+    }
+}
+```
+
+`super` 关键字
+
+`super` 关键字可以当作函数使用，也可以当作对象使用。
+
+当作函数使用，代表着父类的构造函数。ES6要求，子类的构造函数必须执行一次`super`函数。
+
+super 作为对象时， 在普通方法中， 指向父类的原型对象； 在静态
+方法中， 指向父类  

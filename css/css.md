@@ -39,31 +39,23 @@
 
 实现上下居中就比较麻烦了。有3种方法
 
-- 使用flexbox 布局
-- 位置计算  利用posttion属性  将元素left 和top 偏移50%  再减去本身的宽度和高度的50% translateX(50%) translateY(50%)
-- 利用 display table属性
+- 使用flexbox 布局 使用`justify-content`和`align-items`都设置为`center`
+- 位置计算  利用`posttion`属性  将元素`left` 和`top` 偏移50%  再减去本身的宽度和高度的50% `translateX(50%) translateY(50%)`
+- 利用` display table`属性
 
-## margin重叠
+## 什么是BFC（Block formatting  context）
 
-margin是块级元素两个或多个（可能相邻或嵌套重叠）外边距重合起来使用一起使用
+BFC  块级格式化上下文，简单来说它是一个独立的渲染区域，并且有一套渲染规则，决定了子元素如何布局，以及与元素之间的关系和作用
 
-相邻margin重叠的问题
+### 触发BFC的条件
 
-解决办法：
+1. float的值不为none
+2. overflow的值不为visible
+3. position的值为absolute或者fixed
+4. display的值为inline-block、inline-flex、flex、flow-root、table-caption、table-cell
 
-1. 底部元素设置浮动
-2. 底部元素的postion absolute/fixed
-3. 在设置margin-top。bottom统一设置上或下
+### BFC的作用
 
-嵌套marigin问题
-
-父元素无 border、padding、inline content 、 clearance时，子元素的margin-top/bottom会与父元素的margin产生重叠问题。
-
-解决办法：
-
-- 外层元素添加padding
-- 外层元素 overflow:hidden;
-- 外层元素透明边框 border:1px solid transparent;
-- 内层元素绝对定位 postion:absolute:
-- 内层元素 加float:left;或display:inline-block;
-
+1. 利用BFC避免margin重叠 （属于同一个BFC的两个相邻的box的margin会重叠，以大的为主。要想解决这个问题，可以将两个盒子分为不同的BFC中）
+2. 自适应两栏布局  可以阻止元素被浮动的元素覆盖
+3. 清除浮动
