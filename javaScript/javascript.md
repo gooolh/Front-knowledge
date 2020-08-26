@@ -13,6 +13,19 @@
 
 1. object
 
+## 严格模式
+
+1. 为了消除JavaScript语法的不合理、不严谨之处
+2. 为未来新版的javaScript做好铺垫
+
+### 特性
+
+1. 重名问题：严格模式下函数不能有重名的参数
+2. this指向问题：全局作用域的函数中this不再指向全局而是undefined
+3. 静态绑定：禁止使用with
+4. 保留字：使用未来保留字,比如implements, interface, let, package, private, protected, public, static,和yield作为变量名或函数名会报错。
+5. 不能删除变量
+
 ## `underfined`与`null`的区别
 
 - null表示一个 `无` 的对象 underfined 表示变量未赋值
@@ -26,13 +39,13 @@
 ## 手写一个`instanceof`
 
 ```javascript
-function myInstanceof(left,right){
-    let proto=Object.getPrototypeOf(left)
-    while(true){
-        if(proto===null) return false;
-        if(proto===right) return true;
-        proto = Object.getPrototypeOf(proto)
-    }
+function myInstanceof(left, right) {
+  let proto = Object.getPrototypeOf(left)
+  while (proto) {
+    if (proto === right.prototype) return true
+    proto = Object.getPrototypeOf(proto)
+  }
+  return false
 }
 ```
 
@@ -43,6 +56,40 @@ function myNew(fn,...args){
     let instance =Object.create(fn.prototype)  //根据fn的原型创建对象
     let result=fn.call(instance,...args)	//通过构造函数初始化对象，
     return result==='object'? result:instance   //如果构造返回一个对象的话，就使用这个对象，否则使用刚才创建的实例
+}
+```
+
+## 手写call
+
+```javascript
+function myCall(target){
+    let args=Array.prototype.slice.call(arguments,1)
+    target.fn=this
+    target.fn(...args)
+    delete target.fn
+}
+```
+
+## 手写apply
+
+```javascript
+function myApply(target){
+    target.fn=this
+    target.fn(...argument[1])
+    delete target
+}
+```
+
+## 手写bind
+
+```javascript
+function myBind(target){
+ 	let args=[].slice.call(arguments,1)
+    let _this=this
+    return function(){
+        const boundArgs=[].slice.call(arguments)
+        _this.apply(target,args.concat(boundArgs))
+    }
 }
 ```
 
@@ -134,7 +181,6 @@ let obj={
 let obj2=obj
 //与上面一样
 let obj3=Object.assign(obj2)
-//只深拷贝了一层，修改son还是会影响其他变量
 let obj4=Object.assign({},obj2)
 ```
 
@@ -171,7 +217,45 @@ let obj4=Object.assign({},obj2)
   let obj=Object.assign({},old) //注意第一个对象要传个对象，不传的话会直接返回老对象。
   ```
 
-  
+
+## 隐式转换规则
+
+ 转换为字符串规则
+
+```javascript
+数组：相当于执行join(',') 数组中的null和undefinded 转为空字符串  空数组转为空字符
+对象：直接调用Object.prototype.toString(),返回'[Object,Object]'
+其他类型：加个双引号 如'null'
+```
+
+转换为数字
+
+```
+null： 转为0
+undefined：转为NaN
+字符串：如果是纯数字形式，则转为对应的数字，空字符转为0, 否则一律按转换失败处理，转为NaN
+布尔型：true和false被转为1和0
+数组：数组首先会被转为原始类型，也就是ToPrimitive，然后在根据转换后的原始类型按照上面的规则处理，关于ToPrimitive，会在下文中讲到
+对象：同数组的处理
+```
+
+转为布尔类型
+
+```
+js中的假值只有false、null、undefined、空字符、0和NaN，其它值转为布尔型都为true。 
+注意没有'0'
+```
+
+toPromitve
+
+`ToPrimitive`指对象类型类型（如：对象、数组）转换为原始类型的操作。
+
+```
+当对象类型需要被转为原始类型时，它会先查找对象的valueOf方法，如果valueOf方法返回原始类型的值，则ToPrimitive的结果就是这个值
+如果valueOf不存在或者valueOf方法返回的不是原始类型的值，就会尝试调用对象的toString方法，也就是会遵循对象的ToString规则，然后使用toString的返回值作为ToPrimitive的结果。
+```
+
+
 
 ## JS事件执行机制
 
@@ -236,13 +320,14 @@ console.log(2)
 
 js它是单线程的，所以执行任务时需要排队，JS异步执行机制是事件循环，遇到异步操作的时候，并不需要等待执行完成，而是先注册到事件表，交给对应处理浏览器对应的线程处理，所有的同步任务在该主线程中执行，遇到异步任务，对应任务添加到事件线程中，等对应事件准备好了，就放到任务队列中，宏任务放到宏任务队列，微任务放到微任务队列，然后通过轮询消息队列，先执行宏任务，然后执行所有的微任务，如果宏任务产生了微任务，则会在下一次事件循环执行，更新 render,主线程重复执行上述步骤。
 
-## 描述一下作用域链
+## JavaScript 原型，原型链？ 有什么特点？
 
-(答案参考：[《面试分享：两年工作经验成功面试阿里P6总结》](https://juejin.im/post/5d690c726fb9a06b155dd40d#heading-125))
+```
+在js中我们是通过构造函数来新建一个对象的，每个构造函数内部都会有一个原型对象 prototype的属性，这个对象含有所有实例共享的属性和方法，通过构造函数新建一个对象后，在这个对象的内部含有一个指针__proto__ 隐式原型，指向构造函数的原型对象，
+原型链：当我们访问一个对象的属性时，如果在对象的内部不存在这个属性，那么他会去原型对象里找，这个原型对象自己又会有自己的原型，于是就这样一直找下去，就是原型链的概念，原型链的终点时Object.prototype.
+```
 
-当代码在一个环境中创建时，会创建变量对象的一个作用域链（scope chain）来保证对执行环境有权访问的变量和函数。作用域第一个对象始终是当前执行代码所在环境的变量对象（VO）。如果是函数执行阶段，那么将其activation object（AO）作为作用域链第一个对象，第二个对象是上级函数的执行上下文AO，下一个对象依次类推。
 
-在《JavaScript深入之变量对象》中讲到，当查找变量的时候，会先从当前上下文的变量对象中查找，如果没有找到，就会从父级(词法层面上的父级)执行上下文的变量对象中查找，一直找到全局上下文的变量对象，也就是全局对象。这样由多个执行上下文的变量对象构成的链表就叫做作用域链。
 
 ## 闭包
 
@@ -283,7 +368,6 @@ function throttle(fn,interval) {
 
 使用的场景
 
-1. 高频点击提交，表单重复提交
 2. 监听滚动事件，比如是否滑到底部自动加载更多，用throttle来判断
 
 ## 防抖
@@ -307,6 +391,7 @@ function debounce(fn,interval) {
 
 - 搜索框搜索输入。只需用户最后一次输入完，再发送请求
 - 手机号、邮箱验证输入检测
+- 高频点击提交，表单重复提交
 - 窗口大小Resize。只需窗口调整完成后，计算窗口大小。防止重复渲染。
 
 双剑合璧
@@ -335,6 +420,14 @@ function throttle(fn,delay){
 ```
 
 
+
+## mouseenter、mouserleave 和mouseover、mouseout的区别
+
+mouseover：当鼠标移入元素或其子元素都会触发事件，所以有一个重复触发，冒泡过程。对应的移除事件是mouseout
+
+mouseenter:当鼠标移除元素本身（不包含元素的子元素）会触发事件，也就是不会冒泡，对应的移除事件是mouseleave
+
+mouseover 事件因其有冒泡事件，在子元素内移动，频繁被触发，如果我们不希望这样,可以使用mouseenter代替
 
 ## 图片懒加载
 
@@ -431,3 +524,33 @@ function handleFetchQueue(urls, max, callback) {
 }
 ```
 
+## 性能优化
+
+1. 减少资源请求数量
+   合并静态资源，减少重定向，使用缓冲，避免使用空a标签和form表单设置空method
+
+2. 减少资源大小
+   css压缩：删除无效代码，合并语义，js压缩：删除注释，代码缩减，减低代码可读性，
+   服务端使用gzip
+
+3. 优化网络连接
+   使用CDN 内容分发网络，可以根据网络流量和个节点的连接，负载状况以及用户的距离将连接导向用户最近的服务节点上，提高网址的响应速度
+   使用DNS预解析
+
+4. 优化资源加载
+   加载位置：css放在head js放在body底部
+
+   模块按需加载：在SPA等业务复杂的系统中，按需加载
+
+5. 减少回流重绘
+
+   不要使用table布局，避免频繁读取，offset
+
+   动画脱离文档流
+
+   防抖和节流
+
+6. 使用性能更好的API
+
+   使用IntersectionObserver来实现图片的懒加载：传统的做法监听scroll事件加防抖，并调用getBoundingClientRect
+   使用web worker 处理大计算量的代码，避免阻塞用户交互
