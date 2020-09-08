@@ -347,7 +347,6 @@ function* gen() {
     yield 2;
     yield 3;
 }
-v
 let g = gen();
 g.next() // { value: 1, done: false }
 g.return('foo') // { value: "foo", done: true }
@@ -467,7 +466,7 @@ super 作为对象时， 在普通方法中， 指向父类的原型对象； �
 ### CommonJs
 
 - 使用module.exports  导出 模块 require() 导入模块
-- 主要作用于服务端，因为模块是同步加载的，服务端的文件都在本地，读取的时间是硬盘的读取时间，如果在浏览器的使用，模块都放在服务器种，读取的时间取决于网速的快慢，可能等很长时间，浏览器处于假死状态，用户体验不好
+- 主要作用于服务端，因为模块是同步加载的，服务端的文件都在本地，读取的时间是硬盘的读取时间，如果在浏览器的使用，模块都放在服务器中，读取的时间取决于网速的快慢，可能等很长时间，浏览器处于假死状态，用户体验不好
 
 ### AMD
 
@@ -477,7 +476,7 @@ super 作为对象时， 在普通方法中， 指向父类的原型对象； �
 
 ### CMD
 
-CMD 是seajs推崇的规范，CMD是依赖就近，也就是说用的时候才requeire 
+CMD 是seajs推崇的规范，CMD是依赖就近，也就是说用的时候才require 
 
 - AMD和CMD 最大的区别是对依赖模块的执行处理时机不同，二者都是异步加载模块
 - AMD推崇依赖前置，在定义模块的时候就要声明依赖的模块，CMD推崇依赖就近，只有用到的某个模块的时候再去require
@@ -489,6 +488,7 @@ ES6标准出来后， ES6 Moules 规范算是成为前端的主流吧，以 impo
 ### CommonJS与ES6 Modules规范的区别
 
 - CommonJs 模块是运行时加载，ES6 Module编译时输出接口
-- CommonJs 输出的是值得拷贝，ES6 Module输出值得引用，被输出模块得内部得改变会影响引用得改变
+- CommonJs 输出的是值的拷贝，ES6 Module输出值得引用，被输出模块得内部得改变会影响引用的改变
 - CommonJs 导出模块路径可以是一个表达式，因为它是用的是require() 方法，而ES6 Modules只能是字符串
 - CommonJs this 指向当前模块，ES6 Module this 指向undefined
+
