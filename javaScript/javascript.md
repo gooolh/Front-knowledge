@@ -29,7 +29,7 @@
 ## `underfined`与`null`的区别
 
 - null表示一个 `无` 的对象 underfined 表示变量未赋值
-- 在转换为数字时结果不同，`Number(null)`为`0`，而`undefined`为`NaN`。
+- 在转换为数字时结果不同，`Number(null)`为`0`，而``Number(undefined)`为`NaN`。
 
 ## `typeof`与`instanceof`的区别
 
@@ -62,34 +62,35 @@ function myNew(fn,...args){
 ## 手写call
 
 ```javascript
-function myCall(target){
-    let args=Array.prototype.slice.call(arguments,1)
-    target.fn=this
-    target.fn(...args)
-    delete target.fn
+function myCall(target, ...args) {
+  const fn = Symbol('fn')
+  target[fn] = this
+  const res = target[fn](...args)
+  delete target[fn]
+  return res
 }
 ```
 
 ## 手写apply
 
 ```javascript
-function myApply(target){
-    target.fn=this
-    target.fn(...argument[1])
-    delete target
+function myApply(target, args) {
+  const fn = Symbol('fn')
+  target[fn] = this
+  const res = target[fn](...args)
+  delete target[fn]
+  return res
 }
 ```
 
 ## 手写bind
 
 ```javascript
-function myBind(target){
- 	let args=[].slice.call(arguments,1)
-    let _this=this
-    return function(){
-        const boundArgs=[].slice.call(arguments)
-        _this.apply(target,args.concat(boundArgs))
-    }
+function myBind(target, ...args) {
+  let _this = this
+  return function () {
+    return _this.apply(target, [...args, ...arguments])
+  }
 }
 ```
 
@@ -133,34 +134,60 @@ function ajax(options={}) {
 ## 手写Promise
 
 ```javascript
-//简版Promise
-//executor参数是一个方法，方法有个两个参数，resolve，reject 一样为函数，这样简版就没有实现reject
-function Promise(executor) {
-    //用一个数组保存then回调的事件
-    this.onResolveCallback = []
-    let _this=this
-    function resolve(value) {
-        setTimeout(() => {
-            _this.data = value
-            _this.onResolveCallback.forEach(item => item(value))
-        })
-    }
-    executor(resolve)
-}
-Promise.prototype.then = function (onResolved) {
-    const _this = this
-    return new Promise(resolve => {
-        _this.onResolveCallback.push(value => {
-            const result = onResolved(value)
-            //交个用户自定义Promise处理，使用then方法添加事件，再回调处理。
-            if (result instanceof Promise) {
-                result.then(resolve)
-            } else {
-                //执行回调
-                resolve(result)
-            }
-        })
+function myPromise(executor) {
+  this.status = 'pending'
+  this.value = ''
+  this.onResolveCallback = []
+  this.onRejectCallback = []
+  let _this = this
+  function resolve(value) {
+    console.log(_this.onResolveCallback)
+    setTimeout(() => {
+      _this.status = 'fulfilled'
+      _this.value = value
+      _this.onResolveCallback.forEach((t) => t(value))
     })
+  }
+  function reject(reason) {
+    setTimeout(() => {
+      _this.status = 'reject'
+      _this.value = reason
+      _this.onRejectCallback.forEach((t) => t(reason))
+    })
+  }
+  try {
+    executor(resolve, reject)
+  } catch (error) {
+    reject(reject(error))
+  }
+}
+myPromise.prototype.then = function (onFulfilled, onRejected) {
+  return new myPromise((resolve, reject) => {
+    this.onResolveCallback.push((value) => {
+      try {
+        const res = onFulfilled(value)
+        if (res instanceof myPromise) {
+          res.then(resolve, reject)
+        } else {
+          resolve(res)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    })
+    this.onRejectCallback.push((value) => {
+      try {
+        const res = onRejected(value)
+        if (res instanceof myPromise) {
+          res.then(resolve, reject)
+        } else {
+          reject(res)
+        }
+      } catch (error) {
+        reject(error)
+      }
+    })
+  })
 }
 ```
 
@@ -416,7 +443,7 @@ js它是单线程的，所以执行任务时需要排队，JS异步执行机制�
 
 1. **环境记录** 存放着变量和函数的声明
 2. **外部环境的引用**   意味着可以找到外部执行执行上下文，也就是说如果在自己执行上下文中找不到变量，会去找外部执行上下文
-3. 绑定`this`    谁调用函数，函数的`this`就会绑定这个对象，如果没有的话就会执行`window`,严格模式会指向`undefined`
+3. **绑定`this`**    谁调用函数，函数的`this`就会绑定这个对象，如果没有的话就会执行`window`,严格模式会指向`undefined`
 
 ### 创建变量环境
 
@@ -439,7 +466,7 @@ function throttle(fn,interval) {
             fn.apply(_this,args)
             flag=true
         },interval)
-    }
+}
 ```
 
 使用的场景
