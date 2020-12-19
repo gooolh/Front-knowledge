@@ -1,6 +1,6 @@
 ## MVVM
 
-Model-View-ViewModel 的缩写，Model代表数据模型，View代表试图UI，ViewModel是view和model之间的桥梁，通过双向数据绑定把 View 层和 Model 层连接了起来,数据会自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
+Model-View-ViewModel 的缩写，Model代表数据模型，View代表视图UI，ViewModel是view和model之间的桥梁，通过双向数据绑定把 View 层和 Model 层连接了起来,数据会自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。
 
 ## Vue生命周期
 

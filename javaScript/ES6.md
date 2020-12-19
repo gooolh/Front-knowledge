@@ -375,6 +375,21 @@ function *gen(arr) {
 }
 ```
 
+## Async/Await
+
+async/await其实是generator的语法糖，是异步编程解决方案，它的优势在于处理大量 `then` 链，尤其在于需要之前步骤的结果的时，async/await的代码对比promise就会非常的清晰，像同步代码一样。
+
+generator语法糖
+
+​	async函数就是将generator的 `*`替换成async，将yield替换成await，不一样的是
+
+1. async函数内置执行器，函数调用后，会自动执行，而generator需要调用next
+2. 返回值是promise,而generator返回值是一个iterator迭代器
+
+async函数会返回一个promise对象，通过 Promise.resolve() 封装成 Promise 对象
+
+await可以等待一个async函数的返回值，await不仅可以等Promise对象，可以是任意表达式的结果，如果await等待的是一个Promise对象，它会阻塞后面的代码，等待promise对象`resolve`的值，作为await表达式的运算结果
+
 ## class的基本语法
 
 在ES6出现之前，生成对象的方法是通过构造函数。而ES6的`class`可以看作一个语法糖，它的绝大部分功能，ES5都可以做到,新的`class`写法只是让对象的原型的写法更加清晰。

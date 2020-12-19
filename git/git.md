@@ -69,3 +69,59 @@ git reset --mixed //只保留工作区修改
 git reflog //可以查看所有分支的所有操作记录
 ```
 
+### commit规范
+
+​	每个commit message 包括 header,body和footer,各占一行，每行不超过100字符。其中header由type、scope和subjectA组成。**header必须要写**，header的scope是可选的。
+
+```
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+<footer>
+```
+
+**Revert**
+
+如果commit用于撤销之前的commit，需以revert:开头，接着写被撤销的commit的header。body里要写：this reverts commit . ,hash为被撤销的commit的hash值。这种格式也可以由`git revert`命令自动生成。
+
+
+
+**Type**
+
+```
+feat: 新增feature
+fix:修改bug
+docs:仅仅修改了文档，比如README,CHANGELOG,CONTRIBUTE
+style:仅仅修改了空格、格式缩进、逗号等等，不改变代码逻辑
+refactor:代码重构，没有加新功能或者修改bug
+pref:优化相关，比如提示性能、体验
+test: 测试用例，包括单元测试、集成测试等
+build:构建系统或者依赖更新
+cl:CL配置、脚本文件等更新
+chore:改变构建流程、或者增加依赖库、工具等
+revert:回滚到上一个版本
+```
+
+**Scope**
+
+scope用于说明commit修改的范围，比如数据层、控制层、视图层,route, component, utils, build等等。如果修改影响多处，可使用"*"。
+
+**Subject**
+
+Subject是对修改的简要说明：
+
+- 使用祈使语气，一般现在时。
+- 首字母小写
+- 句末不要使用句号
+
+**Body**
+
+使用祈使语气，一般现在时。另外，body需要包含修改的原因和与之前版本的区别。
+
+**Footer**
+
+任何Breaking changes的信息或者关闭issue的信息都可写在Footer. Breaking changes需要以 `BREAKING CHANGE:` 开头。
+
+
+

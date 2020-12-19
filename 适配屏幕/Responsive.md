@@ -36,6 +36,39 @@
 
 ## 移动端1px问题
 
+产生原因：与DPR(devicePixeRatio)设备像素比有关，设备像素比=物理像素/css像素，比如说现在的手机主流的DPR为2，3或者更高，就拿2倍屏来说，要实现物理像素的1px，css像素要写0.5px。但是0.5px并不是所有浏览器都支持，android的就不支持。
+
+解决方案：
+
+1. ​	伪类+transform
+
+   ```css
+   /* 利用伪类实现1px, transform将其缩小0.5倍  再将元素定位我们想要的位置
+   缺点：对于已经有伪类的元素的来说,可能需要多层的嵌套
+   */
+   ```
+
+2. 使用box-shadow模拟边框
+
+   ```css
+   /* 边框有阴影，颜色变浅*/
+   .box-shadow-1px {
+     box-shadow: inset 0px -1px 1px -1px #c8c7cc;
+   }
+   ```
+
+3. viewport + rem实现
+
+   ```html
+   淘宝的做法
+   //对于dpr=2时
+   <meta name="viewport" content="initial-scale=0.5, maximum-scale=0.5, minimum-scale=0.5, user-scalable=no">
+   //对于dpr=3时
+   <meta name="viewport" content="initial-scale=0.3333333333333333, maximum-scale=0.3333333333333333, minimum-scale=0.3333333333333333, user-scalable=no">
+   ```
+
+   
+
 - 移动端1px并不是真正的1个像素，它是等于1px*dpr个物理像素，如果想要`1px`的话就要进行缩放处理。
 - 解决的方案大致有：用小数、用图片、用渐变、用阴影、用 transform 缩放。手机淘宝的做法是使用 js 动态设置 viewport 的 initial-scale。参考（https://www.jianshu.com/p/7e63f5a32636）
 

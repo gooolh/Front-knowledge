@@ -42,7 +42,7 @@
 function myInstanceof(left, right) {
   let proto = Object.getPrototypeOf(left)
   while (proto) {
-    if (proto === right.prototype) return true
+    if (proto === right.prototype) return true;
     proto = Object.getPrototypeOf(proto)
   }
   return false
@@ -189,6 +189,7 @@ myPromise.prototype.then = function (onFulfilled, onRejected) {
     })
   })
 }
+
 ```
 
 

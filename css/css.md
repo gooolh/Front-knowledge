@@ -1,4 +1,16 @@
+### CSS3新特性
 
+- transition：过渡
+- transform: 旋转、缩放、移动或倾斜
+- animation: 动画
+- gradient: 渐变
+- box-shadow: 阴影
+- border-radius: 圆角
+- word-break: normal|break-all|keep-all; 文字换行(默认规则|单词也可以换行|只在半角空格或连字符换行)
+- text-overflow: 文字超出部分处理
+- text-shadow: 水平阴影，垂直阴影，模糊的距离，以及阴影的颜色。
+- box-sizing: content-box|border-box 盒模型
+- 媒体查询 `@media screen and (max-width: 960px) {}`还有打印`print`
 
 ## display常用属性值  inline  block inline-block	
 
@@ -46,7 +58,7 @@
 
 ## 什么是BFC（Block formatting  context）
 
-BFC  块级格式化上下文，简单来说它是一个独立的渲染区域，并且有一套渲染规则，决定了子元素如何布局，以及与元素之间的关系和作用，**具有 BFC 特性的元素可以看作是隔离了的独立容器，容器里面的元素不会在布局上影响到外面的元素，并且 BFC 具有普通容器所没有的一些特性。**
+BFC  块级格式化上下文，简单来说它是一个独立的渲染区域，并且有一套渲染规则，并影响着子元素如何布局，以及与元素之间的关系和作用，**具有 BFC 特性的元素可以看作是隔离了的独立容器，容器里面的元素不会在布局上影响到外面的元素，并且 BFC 具有普通容器所没有的一些特性。**
 
 ### BFC的布局规则
 
@@ -115,7 +127,7 @@ display: -webkit-box;
 
 ​	优点：不需要添加额外dom节点
 
-​	缺点：正常请求下是没问题的，如果当内容的宽度小于左栏的宽度的时候，布局就会发生混乱，圣杯破碎
+​	缺点：正常情况下是没问题的，如果当内容的宽度小于左栏的宽度的时候，布局就会发生混乱，圣杯破碎
 
 ### 双飞翼布局：
 
@@ -126,8 +138,6 @@ display: -webkit-box;
 1. 使用float布局，将margin 设置为负值，将container 设置内边距padding，等于左右两栏的宽度，左右两栏设置left和right偏离原来的宽度
 2. 使用flex布局，将外层容器设置flex容器，和将容器设置flex为1就ok了
 3. 使用grid布局，
-
-
 
 ## 预处理器
 

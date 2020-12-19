@@ -111,11 +111,15 @@ HMR的核心就是客户端从服务端拉取更新后的文件，原理是webpa
 
 ## 构建优化
 
-- 缩小构建目标
+- 使用**exclude **缩小构建目标
 - 速度分析
   webpack有时候打包很慢，我们的项目中可能用到很多loader和pluhin,我们想知道哪个环节打包慢，可以使用**speed-measure-webpack-plugin**插件，计算耗时
 - 体积分析
   可以采用 **webpack-bundle-analyzer** 插件分析包体积，我们可能引用第三方组件库过大，这时候是否需要寻找替代品 
+- **babel-loader** 使用cacheDirectory 缓冲，将转义后的结果缓冲到文件中，之后再构建就会尝试读取缓冲了
+- **cache-loader** 不仅babel-loader 可以缓冲，其他loader也可以缓冲起来
+- 使用**DLL 动态链接库** 可以将经常复用的模块编译成dll，一般是一些第三方的模块 比如 vue react react-dom 只要不升级这些库，动态链接就不需要重新编译
+- **HardSourceWebpackPlugin** ,为模块提高中间缓冲
 - 多进程构建
   **thread-loader**
 - 多进程并行压缩代码
